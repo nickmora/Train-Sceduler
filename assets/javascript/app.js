@@ -19,11 +19,6 @@ $("#add-train").on("click", function(event){
     var trainOne = $("#first-train-input").val().trim();
     var freq = parseInt($("#train-frequency").val().trim());
 
-    console.log(trainName);
-    console.log(dest);
-    console.log(trainOne);
-    console.log(freq);
-
     var newTrain = {
         name: trainName,
         destination: dest,
@@ -46,17 +41,30 @@ database.ref().on("child_added", function(donDraper) {
     var trainOne = donDraper.val().firstTrain;
     var freq = donDraper.val().frequency;
 
-    var whatTimeIsItRightNow= moment().format("HH:mm");
-    console.log(whatTimeIsItRightNow);
+    var next;
+    var minAway;
+    var min;
+    var goblin = trainOne.charAt(3)+trainOne.charAt(4);
+
+    var calcCurrentA = moment().format("HH") * 60;
+    var calcCurrentB = moment().format("mm");
+    var calcCurrent = parseInt(calcCurrentA) + parseInt(calcCurrentB);
+    var calcFirst = parseInt(moment().format(trainOne, "HH")) * 60 + parseInt(goblin);
 
 
-    var calcHr= parseInt(moment().format("HH"))*60 + parseInt(moment().format("mm"));
+
+    if(calcCurrent>calcFirst){
+        var noodle = calcCurrent-calcFirst;
+        min = noodle%parseInt(freq);
+        minAway= parseInt(freq)-parseInt(min);
+        next = moment().add(minAway, "minutes").format("h:mm a");
+    }
+    else {
+        next = moment(trainOne, "HH:mm").format("h:mm a");
+        minAway = calcFirst-calcCurrent;
+    };
 
 
-    var minAway = calcHr%parseInt(freq);
-    console.log(calcHr);
-    console.log(minAway);
-    var next = moment().add(minAway, "minutes").format("HH:mm");
     
     var newRow = $("<tr>").append(
         $("<td>").text(trainName),
